@@ -22,7 +22,7 @@ import { ConfigService } from '@nestjs/config';
           from: '"recipes-admin" [No Reply]', // outgoing email ID
         },
         template: {
-          dir: process.cwd() + '/src/mail/templates/',
+          dir: __dirname + '/templates/',
           adapter: new HandlebarsAdapter(undefined, {
             inlineCssEnabled: true,
             inlineCssOptions: {
