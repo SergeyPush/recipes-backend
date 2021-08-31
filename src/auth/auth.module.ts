@@ -9,17 +9,21 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { MailModule } from '../mail/mail.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     MailModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'topSecret',
-      signOptions: {
-        expiresIn: '24h',
-      },
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: {
+          expiresIn: '24h',
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [AuthService, UsersService, JwtStrategy],
