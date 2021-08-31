@@ -10,12 +10,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async findOne(email: string) {
@@ -42,6 +44,8 @@ export class UsersService {
       email,
     });
     await user.save();
+    await this.sendEmail(user);
+
     return this.generateToken({ email: user.email, id: user.id });
   }
 
@@ -49,6 +53,10 @@ export class UsersService {
     const { email, password } = loginUserDto;
     const user = await this.validateUser(email, password);
     return this.generateToken({ email: user.email, id: user.id });
+  }
+
+  async sendEmail(user: User) {
+    await this.mailService.sendUserConfirmation(user);
   }
 
   async validateUser(email: string, pass: string): Promise<any> {

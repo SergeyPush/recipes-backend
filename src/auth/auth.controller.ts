@@ -21,7 +21,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard())
   @Get('/who')
-  whoami(@GetUser() user) {
+  async whoami(@GetUser() user) {
     return user;
   }
 }
